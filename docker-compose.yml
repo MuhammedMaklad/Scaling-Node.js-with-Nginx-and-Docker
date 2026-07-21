@@ -1,0 +1,30 @@
+services:
+  proxy:
+    image: nginx:alpine
+    container_name: nginx_container
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - webnet
+  api:
+    build:
+      context: ./node-app
+      dockerfile: Dockerfile
+    # Uncomment the following lines if you run only one container with a specific name and expose the port
+    # container_name: api_container
+    # ports:
+    #   - "3000:3000"
+    networks:
+      - webnet
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    deploy:
+      replicas: 3
+    depends_on:
+      - proxy
+networks:
+  webnet:
+    driver: bridge
